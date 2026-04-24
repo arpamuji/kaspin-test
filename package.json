@@ -11,7 +11,9 @@
     "prepare": "husky"
   },
   "dependencies": {
+    "@tabler/icons-react": "^3.41.1",
     "@tailwindcss/vite": "^4.2.4",
+    "jsqr": "^1.4.0",
     "qrcode.react": "^4.2.0",
     "react": "^19.2.5",
     "react-dom": "^19.2.5",

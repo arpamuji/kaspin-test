@@ -3,4 +3,18 @@
 
 @theme {
   --font-sans: 'Inter', sans-serif;
+  --color-kasirpintar-teal-50: #e0f2f1;
+  --color-kasirpintar-teal-100: #b2dfdb;
+  --color-kasirpintar-teal-200: #80cbc4;
+  --color-kasirpintar-teal-400: #26a69a;
+  --color-kasirpintar-teal-500: #009688;
+  --color-kasirpintar-teal-600: #00877a;
+  --color-kasirpintar-teal-700: #00796b;
+  --color-kasirpintar-gold-50: #fff8e1;
+  --color-kasirpintar-gold-100: #feefc7;
+  --color-kasirpintar-gold-200: #fcde8b;
+  --color-kasirpintar-gold-300: #fbc74e;
+  --color-kasirpintar-gold-400: #f9b81c;
+  --color-kasirpintar-gold-500: #f9ac1b;
+  --color-kasirpintar-gold-600: #e09a10;
 }
