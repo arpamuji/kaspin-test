@@ -4,7 +4,7 @@ export const formatRupiah = (amount: number): string => {
     currency: 'IDR',
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
-  }).format(amount);
+  }).format(amount).replace(/^Rp\s+/g, 'Rp');
 };
 
 export const parseAmountInput = (value: string): string => {

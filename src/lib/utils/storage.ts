@@ -5,9 +5,9 @@ const STORAGE_KEYS = {
 } as const;
 
 export interface KaspinStorage {
-  kaspin_qris: string;
-  kaspin_pin: string;
-  kaspin_setup_at: number;
+  QRIS: string;
+  PIN: string;
+  SETUP_AT: number;
 }
 
 export const storage = {
