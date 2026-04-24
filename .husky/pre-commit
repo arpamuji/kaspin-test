@@ -1,1 +1,1 @@
-bunx prettier --write --cache --ignore-unknown --staged
+bunx lint-staged
