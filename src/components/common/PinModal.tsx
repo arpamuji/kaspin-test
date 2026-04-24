@@ -47,11 +47,23 @@ export function PinModal({
         setConfirmError('PIN tidak cocok');
         return;
       }
+    }
+    try {
       await onSubmit(pin, confirmPin);
-    } else {
-      await onSubmit(pin);
+    } catch {
+      // Parent component handles errors
     }
   }, [variant, pin, confirmPin, onSubmit]);
+
+  // Close on Escape key
+  React.useEffect(() => {
+    if (!isOpen) return;
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [isOpen, onClose]);
 
   if (!isOpen) return null;
 

@@ -22,13 +22,9 @@ export function SetupView({
 }: SetupViewProps) {
   const [showPinModal, setShowPinModal] = React.useState(false);
   const [pinError, setPinError] = React.useState('');
-  const [qrisValid, setQrisValid] = React.useState(false);
 
   const validationResult = validateQRIS(qrisString);
-
-  React.useEffect(() => {
-    setQrisValid(validationResult.valid && qrisString.length > 0);
-  }, [validationResult, qrisString]);
+  const qrisValid = validationResult.valid && qrisString.length > 0;
 
   const handleSubmit = React.useCallback(() => {
     if (!qrisValid) {

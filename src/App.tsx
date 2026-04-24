@@ -9,6 +9,19 @@ import { useSetupState } from '@/hooks/useSetupState';
 import { useQRISGeneration } from '@/hooks/useQRISGeneration';
 import { validateQRIS, parseQRIS } from '@/lib/qris';
 
+const Notification = ({
+  message,
+  visible,
+}: {
+  message: string;
+  visible: boolean;
+}) =>
+  visible ? (
+    <div className="fixed bottom-4 left-1/2 z-50 -translate-x-1/2 rounded-xl bg-gray-900 px-4 py-2 text-sm font-medium text-white shadow-lg">
+      {message}
+    </div>
+  ) : null;
+
 type View = 'main' | 'setup' | 'settings' | 'qr';
 
 function App() {
@@ -97,15 +110,11 @@ function App() {
 
     // Wrap the QR SVG in a larger SVG with padding
     const originalSvg = svg as SVGSVGElement;
-    const viewBox =
-      originalSvg.getAttribute('viewBox') ||
-      `0 0 ${originalSvg.viewBox.baseVal.width} ${originalSvg.viewBox.baseVal.height}`;
 
     const padding = 80;
     const qrSize = 1024 - padding * 2; // 864
     const innerPad = 16;
     const svgSize = qrSize - innerPad * 2; // 832
-    const scale = svgSize / 256;
 
     const svgEl = originalSvg.cloneNode(true) as SVGSVGElement;
     const svgW = svgEl.viewBox.baseVal.width || 256;
@@ -214,11 +223,10 @@ function App() {
             onClose={handleCloseQR}
           />
         </div>
-        {showNotification && (
-          <div className="fixed bottom-4 left-1/2 z-50 -translate-x-1/2 rounded-xl bg-gray-900 px-4 py-2 text-sm font-medium text-white shadow-lg">
-            {notificationMessage}
-          </div>
-        )}
+        <Notification
+          message={notificationMessage}
+          visible={showNotification}
+        />
       </>
     );
   }
@@ -237,11 +245,10 @@ function App() {
             onBack={() => setCurrentView('main')}
           />
         </div>
-        {showNotification && (
-          <div className="fixed bottom-4 left-1/2 z-50 -translate-x-1/2 rounded-xl bg-gray-900 px-4 py-2 text-sm font-medium text-white shadow-lg">
-            {notificationMessage}
-          </div>
-        )}
+        <Notification
+          message={notificationMessage}
+          visible={showNotification}
+        />
       </>
     );
   }
@@ -263,11 +270,10 @@ function App() {
             />
           </div>
         </div>
-        {showNotification && (
-          <div className="fixed bottom-4 left-1/2 z-50 -translate-x-1/2 rounded-xl bg-gray-900 px-4 py-2 text-sm font-medium text-white shadow-lg">
-            {notificationMessage}
-          </div>
-        )}
+        <Notification
+          message={notificationMessage}
+          visible={showNotification}
+        />
       </>
     );
   }
@@ -294,11 +300,7 @@ function App() {
         </div>
       </div>
 
-      {showNotification && (
-        <div className="fixed bottom-4 left-1/2 z-50 -translate-x-1/2 rounded-xl bg-gray-900 px-4 py-2 text-sm font-medium text-white shadow-lg">
-          {notificationMessage}
-        </div>
-      )}
+      <Notification message={notificationMessage} visible={showNotification} />
     </>
   );
 }

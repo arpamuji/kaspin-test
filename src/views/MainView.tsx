@@ -9,6 +9,13 @@ interface NumericKeypadProps {
   disabled?: boolean;
 }
 
+const KEYS = [
+  ['7', '8', '9'],
+  ['4', '5', '6'],
+  ['1', '2', '3'],
+  ['0', 'C', '⌫'],
+] as const;
+
 function NumericKeypad({
   value,
   onChange,
@@ -36,13 +43,6 @@ function NumericKeypad({
     },
     [disabled, onChange, value]
   );
-
-  const keys = [
-    ['7', '8', '9'],
-    ['4', '5', '6'],
-    ['1', '2', '3'],
-    ['0', 'C', '⌫'],
-  ];
 
   // Physical keyboard listener
   React.useEffect(() => {
@@ -72,7 +72,7 @@ function NumericKeypad({
 
   return (
     <div className="grid grid-cols-3 gap-3 p-4">
-      {keys.map((row) =>
+      {KEYS.map((row) =>
         row.map((key) => (
           <button
             key={key}

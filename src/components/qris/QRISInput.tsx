@@ -43,59 +43,28 @@ export function QRISInput({
 
   const scanFromImage = useCallback(
     (file: File) => {
-      console.log(
-        '[QRISInput] scanFromImage called with file:',
-        file.name,
-        file.type,
-        file.size,
-        'bytes'
-      );
-
       const reader = new FileReader();
       reader.onload = async (e) => {
-        console.log('[QRISInput] FileReader onload triggered');
-        console.log(
-          '[QRISInput] FileReader result:',
-          e.target?.result ? 'exists' : 'null'
-        );
-
         try {
           const img = new Image();
 
           img.onload = () => {
-            console.log('[QRISInput] Image loaded successfully');
-            console.log(
-              '[QRISInput] Image dimensions:',
-              img.width,
-              'x',
-              img.height
-            );
-
             const canvas = canvasRef.current;
             if (!canvas) {
-              console.error('[QRISInput] Canvas ref is null');
               setScanError('Canvas tidak tersedia');
               return;
             }
 
             const ctx = canvas.getContext('2d');
             if (!ctx) {
-              console.error('[QRISInput] Cannot get 2D context');
-              setScanError('Cannot access canvas context');
+              setScanError('Gagal mengakses canvas context');
               return;
             }
 
             canvas.width = img.width;
             canvas.height = img.height;
-            console.log(
-              '[QRISInput] Canvas set to:',
-              canvas.width,
-              'x',
-              canvas.height
-            );
 
             ctx.drawImage(img, 0, 0);
-            console.log('[QRISInput] Image drawn to canvas');
 
             const imageData = ctx.getImageData(
               0,
@@ -103,96 +72,52 @@ export function QRISInput({
               canvas.width,
               canvas.height
             );
-            console.log(
-              '[QRISInput] ImageData extracted:',
-              imageData.width,
-              'x',
-              imageData.height,
-              'data length:',
-              imageData.data.length
-            );
 
             const code = jsQR(
               imageData.data,
               imageData.width,
               imageData.height
             );
-            console.log(
-              '[QRISInput] jsQR result:',
-              code ? 'QR found!' : 'No QR detected'
-            );
 
             if (code) {
-              console.log(
-                '[QRISInput] QR Data:',
-                code.data.substring(0, 50) + '...'
-              );
               processQRCode(code.data);
             } else {
-              console.warn(
-                '[QRISInput] jsQR could not detect QR code in image'
-              );
               setScanError('QR code tidak terdeteksi dalam gambar');
             }
           };
 
           img.onerror = () => {
-            console.error(
-              '[QRISInput] Image onload error - failed to load image'
-            );
             setScanError('Gagal memuat gambar');
           };
 
-          console.log('[QRISInput] Setting img.src to data URL');
           img.src = e.target?.result as string;
-        } catch (err) {
-          console.error('[QRISInput] Exception in scanFromImage:', err);
+        } catch {
           setScanError('Gagal memproses gambar');
         }
       };
 
       reader.onerror = () => {
-        console.error('[QRISInput] FileReader error');
         setScanError('Gagal membaca file');
       };
 
-      console.log('[QRISInput] Reading file as DataURL');
       reader.readAsDataURL(file);
     },
     [processQRCode]
   );
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    console.log('[QRISInput] handleFileSelect triggered');
     const file = e.target.files?.[0];
     if (file) {
-      console.log(
-        '[QRISInput] File selected:',
-        file.name,
-        file.type,
-        file.size
-      );
       scanFromImage(file);
-    } else {
-      console.warn('[QRISInput] No file selected');
     }
   };
 
   const handleDrop = useCallback(
     (e: React.DragEvent) => {
       e.preventDefault();
-      console.log('[QRISInput] handleDrop triggered');
       const file = e.dataTransfer.files?.[0];
       if (file && file.type.startsWith('image/')) {
-        console.log(
-          '[QRISInput] Dropped file:',
-          file.name,
-          file.type,
-          file.size
-        );
         scanFromImage(file);
-      } else {
-        console.warn('[QRISInput] Dropped file is not an image or missing');
       }
     },
     [scanFromImage]
@@ -245,36 +170,38 @@ export function QRISInput({
     }
   };
 
-  const stopCamera = () => {
+  const stopCamera = React.useCallback(() => {
     if (videoRef.current?.srcObject) {
       const stream = videoRef.current.srcObject as MediaStream;
       stream.getTracks().forEach((track) => track.stop());
+      videoRef.current.srcObject = null;
     }
     setIsScanning(false);
-  };
+  }, []);
+
+  // Cleanup camera stream on unmount
+  React.useEffect(() => {
+    return () => {
+      if (videoRef.current?.srcObject) {
+        const stream = videoRef.current.srcObject as MediaStream;
+        stream.getTracks().forEach((track) => track.stop());
+      }
+    };
+  }, []);
 
   const handlePaste = useCallback(
     (e: React.ClipboardEvent) => {
-      console.log('[QRISInput] handlePaste triggered');
       const items = e.clipboardData.items;
       for (let i = 0; i < items.length; i++) {
-        console.log('[QRISInput] Clipboard item:', items[i].type);
         if (items[i].type.startsWith('image/')) {
           e.preventDefault();
           const file = items[i].getAsFile();
-          console.log(
-            '[QRISInput] Image from clipboard:',
-            file?.name,
-            file?.type,
-            file?.size
-          );
           if (file) {
             scanFromImage(file);
           }
           return;
         }
       }
-      console.warn('[QRISInput] No image found in clipboard');
     },
     [scanFromImage]
   );
