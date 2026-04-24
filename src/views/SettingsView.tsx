@@ -12,6 +12,7 @@ import { hashValue } from '@/lib/utils/crypto';
 
 interface SettingsViewProps {
   currentPin: string;
+  qrisString: string;
   onChangePin: (newPin: string) => void;
   onChangeQris: () => void;
   onClearData: () => void;
@@ -20,6 +21,7 @@ interface SettingsViewProps {
 
 export function SettingsView({
   currentPin,
+  qrisString,
   onChangePin,
   onChangeQris,
   onClearData,
@@ -30,7 +32,7 @@ export function SettingsView({
   const [showClearConfirm, setShowClearConfirm] = React.useState(false);
   const [step, setStep] = React.useState<'verify' | 'setup'>('verify');
   const [pendingAction, setPendingAction] = React.useState<
-    'changeQris' | 'changePin' | null
+    'changeQris' | 'changePin' | 'clearData' | null
   >(null);
 
   const handleVerifyPin = React.useCallback(
@@ -45,6 +47,10 @@ export function SettingsView({
         setShowPinModal(false);
         setPendingAction(null);
         onChangeQris();
+      } else if (pendingAction === 'clearData') {
+        setShowPinModal(false);
+        setPendingAction(null);
+        setShowClearConfirm(true);
       } else {
         // changePin or default — transition to setup mode in same modal
         setStep('setup');
@@ -70,20 +76,34 @@ export function SettingsView({
 
   const openPinChange = React.useCallback(() => {
     setPendingAction('changePin');
-    setStep('verify');
+    // Skip verify step if no PIN set yet (first-time setup)
+    if (!currentPin) {
+      setStep('setup');
+    } else {
+      setStep('verify');
+    }
     setPinError('');
     setShowPinModal(true);
-  }, []);
+  }, [currentPin]);
 
   const openQrisChange = React.useCallback(() => {
     setPendingAction('changeQris');
+    // Skip verify step if no PIN set yet (first-time setup)
+    if (!currentPin) {
+      setShowPinModal(false);
+      onChangeQris();
+    } else {
+      setStep('verify');
+      setPinError('');
+      setShowPinModal(true);
+    }
+  }, [currentPin, onChangeQris]);
+
+  const openClearConfirm = React.useCallback(() => {
+    setPendingAction('clearData');
     setStep('verify');
     setPinError('');
     setShowPinModal(true);
-  }, []);
-
-  const openClearConfirm = React.useCallback(() => {
-    setShowClearConfirm(true);
   }, []);
 
   const handleClearConfirm = React.useCallback(() => {
@@ -157,8 +177,9 @@ export function SettingsView({
               </div>
             </div>
             <button
+              disabled={!qrisString && !currentPin}
               onClick={openClearConfirm}
-              className="rounded-xl bg-red-600 px-4 py-2 font-semibold text-white transition-colors hover:bg-red-700"
+              className="rounded-xl bg-red-600 px-4 py-2 font-semibold text-white transition-colors hover:bg-red-700 disabled:cursor-not-allowed disabled:bg-gray-300"
             >
               Clear
             </button>

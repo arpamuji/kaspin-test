@@ -6,6 +6,7 @@ interface PinInputProps {
   error?: string;
   disabled?: boolean;
   length?: number;
+  autoFocus?: boolean;
 }
 
 export function PinInput({
@@ -14,6 +15,7 @@ export function PinInput({
   error,
   disabled = false,
   length = 6,
+  autoFocus = true,
 }: PinInputProps) {
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
@@ -49,8 +51,10 @@ export function PinInput({
   };
 
   useEffect(() => {
-    inputRefs.current[0]?.focus();
-  }, []);
+    if (autoFocus) {
+      inputRefs.current[0]?.focus();
+    }
+  }, [autoFocus]);
 
   return (
     <div className="flex flex-col items-center gap-3">

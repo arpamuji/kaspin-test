@@ -67,8 +67,8 @@ function App() {
   );
 
   const handleGenerate = React.useCallback(() => {
-    if (!qrisString) {
-      showToast('QRIS belum diatur');
+    if (!qrisString || !pin) {
+      showToast('Setup belum lengkap');
       return;
     }
 
@@ -76,7 +76,7 @@ function App() {
     if (success) {
       setCurrentView('qr');
     }
-  }, [qrisString, generate, showToast]);
+  }, [qrisString, pin, generate, showToast]);
 
   const handleDownloadQR = React.useCallback(() => {
     if (!generatedQR) return;
@@ -96,8 +96,10 @@ function App() {
     if (!ctx) return;
 
     // Wrap the QR SVG in a larger SVG with padding
-    const originalSvg = svg as SVGElement;
-    const viewBox = originalSvg.getAttribute('viewBox') || `0 0 ${originalSvg.viewBox.baseVal.width} ${originalSvg.viewBox.baseVal.height}`;
+    const originalSvg = svg as SVGSVGElement;
+    const viewBox =
+      originalSvg.getAttribute('viewBox') ||
+      `0 0 ${originalSvg.viewBox.baseVal.width} ${originalSvg.viewBox.baseVal.height}`;
 
     const padding = 80;
     const qrSize = 1024 - padding * 2; // 864
@@ -105,7 +107,7 @@ function App() {
     const svgSize = qrSize - innerPad * 2; // 832
     const scale = svgSize / 256;
 
-    const svgEl = originalSvg.cloneNode(true) as SVGElement;
+    const svgEl = originalSvg.cloneNode(true) as SVGSVGElement;
     const svgW = svgEl.viewBox.baseVal.width || 256;
     const svgH = svgEl.viewBox.baseVal.height || 256;
     const scaleX = svgSize / svgW;
@@ -202,8 +204,12 @@ function App() {
           <QRDisplay
             qrString={generatedQR}
             amount={amount}
-            merchantName={qrisString ? parseQRIS(qrisString)?.merchantName || '' : ''}
-            merchantCity={qrisString ? parseQRIS(qrisString)?.merchantCity || '' : ''}
+            merchantName={
+              qrisString ? parseQRIS(qrisString)?.merchantName || '' : ''
+            }
+            merchantCity={
+              qrisString ? parseQRIS(qrisString)?.merchantCity || '' : ''
+            }
             onDownload={handleDownloadQR}
             onClose={handleCloseQR}
           />
@@ -224,6 +230,7 @@ function App() {
         <div className="mx-auto min-h-screen max-w-lg border-x border-gray-100">
           <SettingsView
             currentPin={pin || ''}
+            qrisString={qrisString || ''}
             onChangePin={changePin}
             onChangeQris={handleChangeQris}
             onClearData={handleClearData}
@@ -282,7 +289,7 @@ function App() {
             onFeeTypeChange={setFeeType}
             onFeeValueChange={setFeeValue}
             onGenerate={handleGenerate}
-            canGenerate={amount > 0}
+            canGenerate={amount > 0 && !!qrisString && !!pin}
           />
         </div>
       </div>

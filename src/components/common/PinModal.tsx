@@ -22,6 +22,7 @@ export function PinModal({
   const [pin, setPin] = React.useState('');
   const [confirmPin, setConfirmPin] = React.useState('');
   const [confirmError, setConfirmError] = React.useState('');
+  const [setupKey, setSetupKey] = React.useState(0);
 
   React.useEffect(() => {
     if (isOpen) {
@@ -30,6 +31,15 @@ export function PinModal({
       setConfirmError('');
     }
   }, [isOpen]);
+
+  React.useEffect(() => {
+    if (variant === 'setup') {
+      setPin('');
+      setConfirmPin('');
+      setConfirmError('');
+      setSetupKey((k) => k + 1);
+    }
+  }, [variant]);
 
   const handleSubmit = React.useCallback(async () => {
     if (variant === 'setup') {
@@ -68,17 +78,25 @@ export function PinModal({
         </p>
 
         <div className="space-y-4">
-          <PinInput value={pin} onChange={setPin} error={error} length={6} />
+          <PinInput
+            key={setupKey}
+            value={pin}
+            onChange={setPin}
+            error={error}
+            length={6}
+          />
 
           {variant === 'setup' && (
             <>
               <div className="text-center">
                 <p className="mb-2 text-xs text-gray-400">Konfirmasi PIN</p>
                 <PinInput
+                  key={setupKey}
                   value={confirmPin}
                   onChange={setConfirmPin}
                   error={confirmError}
                   length={6}
+                  autoFocus={false}
                 />
               </div>
             </>
